@@ -12,15 +12,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Connection
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Device
-import kr.rabbito.obdtoandroidwithcompose.obd.OBD_ACTIVATE_AUTO_PROTOCOL_SEARCH
-import kr.rabbito.obdtoandroidwithcompose.obd.OBD_RESET
+import kr.rabbito.obdtoandroidwithcompose.obd.*
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 
-class Repository {
-    fun getDevice(address: String, uuid: String): Device {
+interface Repository {
+    fun getDevice(address: String, uuid: String): Device
+    suspend fun connectToDevice(device: Device, context: Context): Connection?
+    suspend fun getSpeed(connection: Connection): Int?
+}
+
+class OBDRepository : Repository {
+    override fun getDevice(address: String, uuid: String): Device {
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
         val bluetoothDevice = bluetoothAdapter.getRemoteDevice(address)
@@ -29,7 +34,7 @@ class Repository {
         return Device(bluetoothDevice, address, uuid)
     }
 
-    suspend fun connectToDevice(device: Device, context: Context): Connection? {
+    override suspend fun connectToDevice(device: Device, context: Context): Connection? {
         var socket: BluetoothSocket? = null
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT)
@@ -42,8 +47,19 @@ class Repository {
         return Connection(socket, socket.inputStream, socket.outputStream)
     }
 
-    suspend fun getSpeed() {
+    override suspend fun getSpeed(connection: Connection): Int? {
+        val speedResponse = sendCommand(connection.inputStream, connection.outputStream, OBD_SPEED)
 
+        if (!speedResponse.contains(OBD_SPEED_RESPONSE)) {
+            Log.e("OBD_ERROR", "Invalid response for speed command: $speedResponse")
+
+            return -1
+        }
+
+        val speed = parseSpeed(speedResponse)
+        Log.d("check speed", "Current speed: $speed km/h")
+
+        return speed
     }
 }
 
@@ -91,4 +107,18 @@ private suspend fun sendCommand(
     }
 
     return String(buffer, 0, bytesRead).trim()
+}
+
+private fun parseSpeed(response: String): Int? {
+    val cleanedResponse = response.replace("\r", "").replace("\n", "").replace(">", "")
+    val dataFields = cleanedResponse.split(" ")
+
+    if (dataFields.size < 4) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = dataFields[3].replace(">", "")
+    Log.d("check dataFields", "${hexResult}")
+    return hexResult.toInt(16)
 }
