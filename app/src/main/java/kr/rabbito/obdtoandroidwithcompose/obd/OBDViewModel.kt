@@ -1,18 +1,43 @@
 package kr.rabbito.obdtoandroidwithcompose.obd
 
+import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import kr.rabbito.obdtoandroidwithcompose.data.Repository
+import kr.rabbito.obdtoandroidwithcompose.data.entity.Connection
+import kr.rabbito.obdtoandroidwithcompose.data.entity.Device
 
 class OBDViewModel(
     private val repository: Repository
 ) : ViewModel() {
+    private val _device: MutableLiveData<Device> = MutableLiveData()
+    val device: LiveData<Device> = _device
+
+    private val _connection: MutableLiveData<Connection> = MutableLiveData()
+    val connection: LiveData<Connection> = _connection
+
     private val _speed: MutableLiveData<Int?> = MutableLiveData()
     val speed: LiveData<Int?> = _speed
 
+    fun loadDevice(address: String, uuid: String) {
+        repository.getDevice(address, uuid).let {
+            _device.postValue(it)
+        }
+    }
 
+    suspend fun loadConnection(device: Device, context: Context) {
+        repository.connectToDevice(device, context).let {
+            _connection.postValue(it)
+        }
+    }
+
+    suspend fun loadSpeed(connection: Connection) {
+        repository.getSpeed(connection).let {
+            _speed.postValue(it)
+        }
+    }
 }
 
 class OBDViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {

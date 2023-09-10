@@ -1,9 +1,9 @@
 package kr.rabbito.obdtoandroidwithcompose.ui
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import kr.rabbito.obdtoandroidwithcompose.ui.component.ScannerApp
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.OBDToAndroidWithComposeTheme
 
 class MainActivity : ComponentActivity() {
