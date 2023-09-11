@@ -20,8 +20,8 @@ import java.util.*
 
 interface Repository {
     fun getDevice(address: String, uuid: String): Device
-    suspend fun connectToDevice(device: Device, context: Context): Connection?
-    suspend fun getSpeed(connection: Connection): Int?
+    suspend fun connectToDevice(device: Device?, context: Context): Connection?
+    suspend fun getSpeed(connection: Connection?): Int?
 }
 
 class OBDRepository : Repository {
@@ -34,7 +34,13 @@ class OBDRepository : Repository {
         return Device(bluetoothDevice, address, uuid)
     }
 
-    override suspend fun connectToDevice(device: Device, context: Context): Connection? {
+    override suspend fun connectToDevice(device: Device?, context: Context): Connection? {
+        if (device == null) {
+            Log.e("INIT_ERROR", "Device not set")
+
+            return null
+        }
+
         var socket: BluetoothSocket? = null
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT)
@@ -47,7 +53,13 @@ class OBDRepository : Repository {
         return Connection(socket, socket.inputStream, socket.outputStream)
     }
 
-    override suspend fun getSpeed(connection: Connection): Int? {
+    override suspend fun getSpeed(connection: Connection?): Int? {
+        if (connection == null) {
+            Log.e("INIT_ERROR", "Connection not set")
+
+            return null
+        }
+
         val speedResponse = sendCommand(connection.inputStream, connection.outputStream, OBD_SPEED)
 
         if (!speedResponse.contains(OBD_SPEED_RESPONSE)) {
@@ -75,16 +87,20 @@ private suspend fun connectSocket(socket: BluetoothSocket?, context: Context) {
         } catch (e: IOException) {
             // 연결에 실패한 경우, 일정 시간 대기 후 다시 시도
             delay(5000) // 5초 대기
-            Log.d("check connection", "waiting...")
+//            Log.d("check connection", "waiting...")
         }
     }
 }
 
 private suspend fun resetDevice(inputStream: InputStream?, outputStream: OutputStream?) {
-    if (inputStream != null && outputStream != null) {
-        sendCommand(inputStream, outputStream, OBD_RESET) // 장치 리셋
-        sendCommand(inputStream, outputStream, OBD_ACTIVATE_AUTO_PROTOCOL_SEARCH) // 자동 프로토콜 검색 활성화
+    if (inputStream == null || outputStream == null) {
+        Log.e("INIT_ERROR", "Socket not set")
+
+        return
     }
+
+    sendCommand(inputStream, outputStream, OBD_RESET) // 장치 리셋
+    sendCommand(inputStream, outputStream, OBD_ACTIVATE_AUTO_PROTOCOL_SEARCH) // 자동 프로토콜 검색 활성화
 }
 
 private suspend fun sendCommand(
@@ -93,17 +109,30 @@ private suspend fun sendCommand(
     command: String
 ): String {
     val sendData = command.toByteArray()
+
     withContext(Dispatchers.IO) {
-        outputStream.write(sendData)
+        try {
+            outputStream.write(sendData)
+        } catch (e: IOException) {
+            Log.e("OBD_ERROR", "write: Disconnected by obd")
+        }
     }
     withContext(Dispatchers.IO) {
-        outputStream.flush()
+        try {
+            outputStream.flush()
+        } catch (e: IOException) {
+            Log.e("OBD_ERROR", "flush: Disconnected by obd")
+        }
     }
     delay(500)
 
     val buffer = ByteArray(1024)
     val bytesRead = withContext(Dispatchers.IO) {
-        inputStream.read(buffer)
+        try {
+            inputStream.read(buffer)
+        } catch (e: IOException) {
+            Log.e("OBD_ERROR", "read: Disconnected by obd")
+        }
     }
 
     return String(buffer, 0, bytesRead).trim()

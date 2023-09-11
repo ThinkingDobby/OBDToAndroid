@@ -1,6 +1,7 @@
 package kr.rabbito.obdtoandroidwithcompose.obd
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,17 +25,18 @@ class OBDViewModel(
         }
     }
 
-    suspend fun loadConnection(device: Device, context: Context) {
+    suspend fun loadConnection(device: Device?, context: Context) {
         repository.connectToDevice(device, context).let {
             connection = it
         }
     }
 
-    suspend fun startSpeedLoading(connection: Connection) {
+    suspend fun startSpeedLoading(connection: Connection?) {
         while (true) {
             repository.getSpeed(connection).let {
                 _speed.postValue(it)
             }
+//            Log.d("check delay", "checking...")
         }
     }
 }
