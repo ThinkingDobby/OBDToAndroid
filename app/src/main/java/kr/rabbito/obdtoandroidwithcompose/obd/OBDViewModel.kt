@@ -12,30 +12,29 @@ import kr.rabbito.obdtoandroidwithcompose.data.entity.Device
 class OBDViewModel(
     private val repository: Repository
 ) : ViewModel() {
-    private val _device: MutableLiveData<Device> = MutableLiveData()
-    val device: LiveData<Device> = _device
-
-    private val _connection: MutableLiveData<Connection> = MutableLiveData()
-    val connection: LiveData<Connection> = _connection
+    var device: Device? = null
+    var connection: Connection? = null
 
     private val _speed: MutableLiveData<Int?> = MutableLiveData()
     val speed: LiveData<Int?> = _speed
 
     fun loadDevice(address: String, uuid: String) {
         repository.getDevice(address, uuid).let {
-            _device.postValue(it)
+            device = it
         }
     }
 
     suspend fun loadConnection(device: Device, context: Context) {
         repository.connectToDevice(device, context).let {
-            _connection.postValue(it)
+            connection = it
         }
     }
 
-    suspend fun loadSpeed(connection: Connection) {
-        repository.getSpeed(connection).let {
-            _speed.postValue(it)
+    suspend fun startSpeedLoading(connection: Connection) {
+        while (true) {
+            repository.getSpeed(connection).let {
+                _speed.postValue(it)
+            }
         }
     }
 }
