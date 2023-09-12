@@ -47,7 +47,7 @@ fun AnimatedPieChart(
     targetProgress: Float,
     total: Float = 360f,
     color: Color = Color.Red,
-    strokeWidth: Dp = 8.dp,
+    strokeWidth: Dp = 5.dp,
     modifier: Modifier = Modifier
 ) {
     val animatedProgress by animateFloatAsState(targetValue = targetProgress)
