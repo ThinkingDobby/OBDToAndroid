@@ -65,7 +65,7 @@ class OBDRepository : Repository {
         if (!speedResponse.contains(OBD_SPEED_RESPONSE)) {
             Log.e("OBD_ERROR", "Invalid response for speed command: $speedResponse")
 
-            return -1
+            return 0
         }
 
         val speed = parseSpeed(speedResponse)
