@@ -83,7 +83,7 @@ fun SmallGauge(title: String, state: State<Int?>, unit: String, total: Int, colo
                 style = smallGaugeTitleStyle
             )
 
-            Spacer(modifier = Modifier.height(2.dp))
+            Spacer(modifier = Modifier.height(1.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically

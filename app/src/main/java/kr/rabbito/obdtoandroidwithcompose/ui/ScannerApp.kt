@@ -12,6 +12,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import kr.rabbito.obdtoandroidwithcompose.R
 import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModel
 import kr.rabbito.obdtoandroidwithcompose.ui.component.LargeGauge
+import kr.rabbito.obdtoandroidwithcompose.ui.component.SmallGauge
+import kr.rabbito.obdtoandroidwithcompose.ui.theme.Blue
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.LightRed
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Red
 
@@ -29,12 +31,21 @@ fun ScannerApp(viewModel: OBDViewModel) {
 
             Spacer(modifier = Modifier.height(44.dp))
             LargeGauge(R.drawable.main_icon_speed, state = viewModel.speed.observeAsState(), "km/h", total = 240, color = Red)
-        }
 
-        Row(
+            Spacer(modifier = Modifier.height(32.dp))
 
-        ) {
-
+            Row() {
+                SmallGauge(title = "MAF", state = viewModel.speed.observeAsState(), unit = "g/s", total = 600, color = Blue)
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Column() {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    SmallGauge(title = "스로틀", state = viewModel.speed.observeAsState(), unit = "%", total = 100, color = Blue)   
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                SmallGauge(title = "부하", state = viewModel.speed.observeAsState(), unit = "%", total = 100, color = Blue)
+            }
         }
     }
 }
