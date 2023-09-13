@@ -2,9 +2,11 @@ package kr.rabbito.obdtoandroidwithcompose.ui.theme
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import kr.rabbito.obdtoandroidwithcompose.R
 
 // Set of Material typography styles to start with
 val Typography = Typography(
@@ -12,7 +14,7 @@ val Typography = Typography(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
-    )
+    ),
     /* Other default text styles to override
     button = TextStyle(
         fontFamily = FontFamily.Default,
@@ -25,4 +27,30 @@ val Typography = Typography(
         fontSize = 12.sp
     )
     */
+)
+
+
+// FontFamily
+val Pretendard = FontFamily(
+    Font(R.font.pretendard_regular)
+)
+
+val Roboto = FontFamily(
+    Font(R.font.roboto_regular),
+    Font(R.font.roboto_medium, FontWeight.Medium)
+)
+
+
+// TextStyle
+val largeGaugeValueStyle = TextStyle(
+    fontFamily = Roboto,
+    fontWeight = FontWeight.Medium,
+    fontSize = 32.sp,
+    color = Black
+)
+
+val largeGaugeUnitStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 14.sp,
+    color = Gray
 )

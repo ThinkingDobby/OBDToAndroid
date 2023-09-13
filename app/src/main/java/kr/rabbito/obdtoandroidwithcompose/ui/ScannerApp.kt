@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModel
+import kr.rabbito.obdtoandroidwithcompose.R
 import kr.rabbito.obdtoandroidwithcompose.ui.component.LargeGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.LightRed
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Red
@@ -34,10 +35,10 @@ fun ScannerApp(viewModel: OBDViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(52.dp))
-            LargeGauge(state = viewModel.speed.observeAsState(), total = 7000, color = LightRed)
+            LargeGauge(R.drawable.main_icon_rpm, state = viewModel.speed.observeAsState(), "rpm", total = 7000, color = LightRed)
 
             Spacer(modifier = Modifier.height(44.dp))
-            LargeGauge(state = viewModel.speed.observeAsState(), total = 240, color = Red)
+            LargeGauge(R.drawable.main_icon_speed, state = viewModel.speed.observeAsState(), "km/h", total = 240, color = Red)
         }
     }
 }
