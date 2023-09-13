@@ -54,3 +54,21 @@ val largeGaugeUnitStyle = TextStyle(
     fontSize = 14.sp,
     color = Gray
 )
+
+val smallGaugeTitleStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 14.sp,
+    color = Black
+)
+
+val smallGaugeValueStyle = TextStyle(
+    fontFamily = Roboto,
+    fontSize = 16.sp,
+    color = Black
+)
+
+val smallGaugeUnitStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 12.sp,
+    color = Gray
+)

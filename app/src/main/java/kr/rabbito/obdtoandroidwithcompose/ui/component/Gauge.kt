@@ -10,8 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kr.rabbito.obdtoandroidwithcompose.R
-import kr.rabbito.obdtoandroidwithcompose.ui.theme.largeGaugeUnitStyle
-import kr.rabbito.obdtoandroidwithcompose.ui.theme.largeGaugeValueStyle
+import kr.rabbito.obdtoandroidwithcompose.ui.theme.*
 
 @Composable
 fun LargeGauge(icon: Int, state: State<Int?>, unit: String, total: Int, color: androidx.compose.ui.graphics.Color) {
@@ -57,6 +56,57 @@ fun LargeGauge(icon: Int, state: State<Int?>, unit: String, total: Int, color: a
             total = total.toFloat(),
             color = color,
             modifier = Modifier.size(180.dp)
+        )
+    }
+}
+
+@Composable
+fun SmallGauge(title: String, state: State<Int?>, unit: String, total: Int, color: androidx.compose.ui.graphics.Color) {
+    Box(
+        modifier = Modifier
+            .size(width = 75.dp, height = 75.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        val value = state.value ?: 0
+
+        Image(
+            painterResource(id = R.drawable.main_iv_gauge_background_small),
+            "gauge_background",
+            modifier = Modifier.size(width = 71.dp, height = 71.dp)
+        )
+
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                title,
+                style = smallGaugeTitleStyle
+            )
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    value.toString(),
+                    style = smallGaugeValueStyle
+                )
+
+                Spacer(modifier = Modifier.width(2.dp))
+
+                Text(
+                    unit,
+                    style = smallGaugeUnitStyle
+                )
+            }
+        }
+
+        AnimatedPieChart(
+            targetProgress = value.toFloat(),
+            total = total.toFloat(),
+            color = color,
+            modifier = Modifier.size(75.dp)
         )
     }
 }
