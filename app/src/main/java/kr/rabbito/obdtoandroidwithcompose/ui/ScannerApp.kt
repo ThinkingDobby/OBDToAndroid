@@ -58,20 +58,22 @@ fun ScannerApp(viewModel: OBDViewModel) {
             ) {
                 Spacer(modifier = Modifier.width(45.dp))
 
-                BarGauge(icon = R.drawable.main_icon_coolant_temp, state = viewModel.speed.observeAsState(), total = 60, color = Green)
+            BarGauge(icon = R.drawable.main_icon_coolant_temp, state = viewModel.speed.observeAsState(), total = 60, color = Green) // 수치에서 60뺀 후 적용해야 (범위: 60~120)
                 Spacer(modifier = Modifier.width(32.dp))
                 
-                BarGauge(icon = R.drawable.main_icon_fuel, state = viewModel.speed.observeAsState(), total = 60, color = Green)
+                BarGauge(icon = R.drawable.main_icon_fuel, state = viewModel.speed.observeAsState(), total = 100, color = Green)
                 Spacer(modifier = Modifier.width(15.dp))
 
                 Column() {
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Image(
-                        painterResource(id = R.drawable.main_iv_fuel_eff_background),
-                        "123",
-                        modifier = Modifier.size(width = 186.dp, height = 140.dp)
-                    )
+                    Box() {
+                        Image(
+                            painterResource(id = R.drawable.main_iv_fuel_eff_background),
+                            "123",
+                            modifier = Modifier.size(width = 186.dp, height = 140.dp)
+                        )
+                    }
                 }
             }
         }
