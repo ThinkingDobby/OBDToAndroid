@@ -72,3 +72,22 @@ val smallGaugeUnitStyle = TextStyle(
     fontSize = 12.sp,
     color = Gray
 )
+
+val textGaugeTitleStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 14.sp,
+    color = Black
+)
+
+val textGaugeValueStyle = TextStyle(
+    fontFamily = Roboto,
+    fontWeight = FontWeight.Medium,
+    fontSize = 24.sp,
+    color = Black
+)
+
+val textGaugeUnitStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 14.sp,
+    color = Gray
+)

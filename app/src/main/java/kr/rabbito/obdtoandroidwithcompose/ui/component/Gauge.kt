@@ -143,3 +143,55 @@ fun BarGauge(icon: Int, state: State<Int?>, total: Int, color: androidx.compose.
         )
     }
 }
+
+@Composable
+fun TextGauge(title: String, unit: String, state: State<Int?>) {
+    val value = state.value ?: 0
+
+    Column() {
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Box(
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painterResource(id = R.drawable.main_iv_fuel_eff_background),
+                "gauge_background",
+                modifier = Modifier.size(width = 186.dp, height = 140.dp)
+            )
+
+            Column(
+            ) {
+                Text(
+                    title,
+                    style = textGaugeTitleStyle
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Row(
+                        modifier = Modifier.width(28.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            value.toString(),
+                            style = textGaugeValueStyle,
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(4.dp))
+
+                    Text(
+                        unit,
+                        style = textGaugeUnitStyle,
+                        modifier = Modifier.padding(bottom = 3.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(6.dp))
+            }
+        }
+    }
+}

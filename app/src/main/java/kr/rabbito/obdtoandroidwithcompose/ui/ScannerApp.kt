@@ -15,6 +15,7 @@ import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModel
 import kr.rabbito.obdtoandroidwithcompose.ui.component.BarGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.component.LargeGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.component.SmallGauge
+import kr.rabbito.obdtoandroidwithcompose.ui.component.TextGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Blue
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Green
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.LightRed
@@ -64,17 +65,7 @@ fun ScannerApp(viewModel: OBDViewModel) {
                 BarGauge(icon = R.drawable.main_icon_fuel, state = viewModel.speed.observeAsState(), total = 100, color = Green)
                 Spacer(modifier = Modifier.width(15.dp))
 
-                Column() {
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    Box() {
-                        Image(
-                            painterResource(id = R.drawable.main_iv_fuel_eff_background),
-                            "123",
-                            modifier = Modifier.size(width = 186.dp, height = 140.dp)
-                        )
-                    }
-                }
+                TextGauge(title = "평균 연비", unit = "km/L", state = viewModel.speed.observeAsState())
             }
         }
     }
