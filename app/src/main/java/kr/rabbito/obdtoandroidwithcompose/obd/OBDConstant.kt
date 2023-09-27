@@ -7,3 +7,6 @@ val OBD_ACTIVATE_AUTO_PROTOCOL_SEARCH = "AT SP 0\r" // 자동 프로토콜 검�
 
 val OBD_SPEED = "01 0D\r"
 val OBD_SPEED_RESPONSE = "41 0D"
+
+val OBD_RPM = "01 0C\r"
+val OBD_RPM_RESPONSE = "41 0C"

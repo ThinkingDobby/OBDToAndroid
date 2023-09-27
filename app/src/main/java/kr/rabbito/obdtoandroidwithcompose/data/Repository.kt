@@ -21,7 +21,7 @@ import java.util.*
 interface Repository {
     fun getDevice(address: String, uuid: String): Device
     suspend fun connectToDevice(device: Device?, context: Context): Connection?
-    suspend fun getSpeed(connection: Connection?): Int?
+    suspend fun getResponse(connection: Connection?, command: String): Array<Int?>?
 }
 
 class OBDRepository : Repository {
@@ -53,25 +53,30 @@ class OBDRepository : Repository {
         return Connection(socket, socket.inputStream, socket.outputStream)
     }
 
-    override suspend fun getSpeed(connection: Connection?): Int? {
+    override suspend fun getResponse(connection: Connection?, command: String): Array<Int?>? {
         if (connection == null) {
             Log.e("INIT_ERROR", "Connection not set")
 
             return null
         }
 
-        val speedResponse = sendCommand(connection.inputStream, connection.outputStream, OBD_SPEED)
+        val response = sendCommand(connection.inputStream, connection.outputStream, command)
 
-        if (!speedResponse.contains(OBD_SPEED_RESPONSE)) {
-            Log.e("OBD_ERROR", "Invalid response for speed command: $speedResponse")
+        val cleanedResponse = response.replace("\r", "").replace("\n", " ").replace(">", "")
+        val dataFields = cleanedResponse.split(" ")
 
-            return 0
+        Log.d("check cleanedResponse", cleanedResponse)
+        if (dataFields.size < 4) return null
+
+        if (dataFields[2] + " " + dataFields[3] == OBD_SPEED_RESPONSE) {
+            return arrayOf(0, parseSpeed(response, dataFields))
+        } else if (response.contains(OBD_RPM_RESPONSE)) {
+            return arrayOf(1, parseRPM(response, dataFields))
+        } else {
+            Log.e("OBD_ERROR", "Invalid response for command: $response")
+
+            return null
         }
-
-        val speed = parseSpeed(speedResponse)
-        Log.d("check speed", "Current speed: $speed km/h")
-
-        return speed
     }
 }
 
@@ -124,7 +129,6 @@ private suspend fun sendCommand(
             Log.e("OBD_ERROR", "flush: Disconnected by obd")
         }
     }
-    delay(500)
 
     val buffer = ByteArray(1024)
     val bytesRead = withContext(Dispatchers.IO) {
@@ -138,16 +142,36 @@ private suspend fun sendCommand(
     return String(buffer, 0, bytesRead).trim()
 }
 
-private fun parseSpeed(response: String): Int? {
-    val cleanedResponse = response.replace("\r", "").replace("\n", "").replace(">", "")
-    val dataFields = cleanedResponse.split(" ")
+fun parseSpeed(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_SPEED_ERROR", "Empty response")
 
-    if (dataFields.size < 4) {
+        return null
+    }
+
+    if (dataFields.size < 5) {
         Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
         return null
     }
 
-    val hexResult = dataFields[3].replace(">", "")
-    Log.d("check dataFields", "${hexResult}")
+    val hexResult = dataFields[4].replace(">", "")
+//    Log.d("check dataFields", "${hexResult}")
     return hexResult.toInt(16)
+}
+
+fun parseRPM(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_RPM_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 6) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = (dataFields[4] + dataFields[5]).replace(">", "")
+//    Log.d("check dataFields", "${dataFields[3]} ${dataFields[4]}")
+    return hexResult.toInt(16) / 4
 }

@@ -5,14 +5,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import kr.rabbito.obdtoandroidwithcompose.data.OBDRepository
-import kr.rabbito.obdtoandroidwithcompose.data.Repository
 import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModel
 import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModelFactory
 import kr.rabbito.obdtoandroidwithcompose.obd.SPP_UUID
@@ -41,7 +39,7 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             viewModel.loadDevice("3C:9C:0F:FB:4D:F6", SPP_UUID) // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"
             viewModel.loadConnection(viewModel.device, this@MainActivity)
-            viewModel.startSpeedLoading(viewModel.connection)
+            viewModel.startDataLoading(viewModel.connection)
         }
     }
 }
