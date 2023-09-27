@@ -30,6 +30,7 @@ fun ScannerApp(viewModel: OBDViewModel) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            Spacer(modifier = Modifier.fillMaxSize(0.01f))
             LargeGauge(R.drawable.main_icon_rpm, state = viewModel.rpm.observeAsState(), "rpm", total = 7000, color = LightRed)
 
             Spacer(modifier = Modifier.fillMaxSize(0.04f))

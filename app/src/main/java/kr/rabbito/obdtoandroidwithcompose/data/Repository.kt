@@ -66,7 +66,7 @@ class OBDRepository : Repository {
         val cleanedResponse = response.replace("\r", "").replace("\n", " ").replace(">", "")
         val dataFields = cleanedResponse.split(" ")
 
-        Log.d("check cleanedResponse", cleanedResponse)
+//        Log.d("check cleanedResponse", cleanedResponse)
         if (dataFields.size < 4) return null
 
         val code = dataFields[2] + " " + dataFields[3]
