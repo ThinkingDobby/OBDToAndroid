@@ -24,6 +24,9 @@ class OBDViewModel(
     private val _rpm: MutableLiveData<Int?> = MutableLiveData()
     val rpm: LiveData<Int?> = _rpm
 
+    private val _coolantTemp: MutableLiveData<Int?> = MutableLiveData()
+    val coolantTemp: LiveData<Int?> = _coolantTemp
+
     fun loadDevice(address: String, uuid: String) {
         repository.getDevice(address, uuid).let {
             device = it
@@ -38,10 +41,12 @@ class OBDViewModel(
 
     suspend fun startDataLoading(connection: Connection?) {
         while (true) {
-            delay(200)
+            delay(100)
             postValue(repository.getResponse(connection, OBD_SPEED))
-            delay(200)
+            delay(100)
             postValue(repository.getResponse(connection, OBD_RPM))
+            delay(100)
+            postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
         }
     }
 
@@ -49,8 +54,9 @@ class OBDViewModel(
         if (response == null) return
 
         when (response[0]) {
-            0 -> _speed.postValue(response[1])
-            1 -> _rpm.postValue(response[1])
+            0 -> _rpm.postValue(response[1])
+            1 -> _speed.postValue(response[1])
+            5 -> _coolantTemp.postValue(response[1]?.minus(60))
         }
     }
 }

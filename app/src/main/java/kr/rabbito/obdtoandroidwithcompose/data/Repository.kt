@@ -17,6 +17,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
+import kotlin.math.max
 
 interface Repository {
     fun getDevice(address: String, uuid: String): Device
@@ -68,14 +69,13 @@ class OBDRepository : Repository {
         Log.d("check cleanedResponse", cleanedResponse)
         if (dataFields.size < 4) return null
 
-        if (dataFields[2] + " " + dataFields[3] == OBD_SPEED_RESPONSE) {
-            return arrayOf(0, parseSpeed(response, dataFields))
-        } else if (response.contains(OBD_RPM_RESPONSE)) {
-            return arrayOf(1, parseRPM(response, dataFields))
-        } else {
-            Log.e("OBD_ERROR", "Invalid response for command: $response")
+        val code = dataFields[2] + " " + dataFields[3]
 
-            return null
+        when (code) {
+            OBD_RPM_RESPONSE -> return arrayOf(0, parseRPM(response, dataFields))
+            OBD_SPEED_RESPONSE -> return arrayOf(1, parseSpeed(response, dataFields))
+            OBD_COOLANT_TEMP_RESPONSE -> return arrayOf(5, parseCoolantTemp(response, dataFields))
+            else -> return null
         }
     }
 }
@@ -174,4 +174,20 @@ fun parseRPM(response: String?, dataFields: List<String>): Int? {
     val hexResult = (dataFields[4] + dataFields[5]).replace(">", "")
 //    Log.d("check dataFields", "${dataFields[3]} ${dataFields[4]}")
     return hexResult.toInt(16) / 4
+}
+fun parseCoolantTemp(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_COOLANT_TEMP_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 5) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = dataFields[4].replace(">", "")
+    Log.d("check dataFields", "${hexResult}")
+    return max(hexResult.toInt(16) - 43, 0)
 }

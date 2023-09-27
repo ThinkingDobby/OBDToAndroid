@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
+import kotlin.math.max
 
 @Composable
 fun BarChart(
@@ -23,7 +24,7 @@ fun BarChart(
 ) {
     Canvas(modifier = modifier) {
         val maxBarHeight = size.height
-        val currentBarHeight = maxBarHeight * (min(progress, total) / total)
+        val currentBarHeight = maxBarHeight * (max(min(progress, total), 0f) / total)
 
         drawRoundRect(
             color = color,
