@@ -74,7 +74,11 @@ class OBDRepository : Repository {
         when (code) {
             OBD_RPM_RESPONSE -> return arrayOf(0, parseRPM(response, dataFields))
             OBD_SPEED_RESPONSE -> return arrayOf(1, parseSpeed(response, dataFields))
+            OBD_MAF_RESPONSE -> return arrayOf(2, parseMAF(response, dataFields))
+            OBD_THROTTLE_POS_RESPONSE -> return arrayOf(3, parseThrottlePos(response, dataFields))
+            OBD_ENGINE_LOAD_RESPONSE -> return arrayOf(4, parseEngineLoad(response, dataFields))
             OBD_COOLANT_TEMP_RESPONSE -> return arrayOf(5, parseCoolantTemp(response, dataFields))
+            OBD_FUEL_RESPONSE -> return arrayOf(6, parseFuel(response, dataFields))
             else -> return null
         }
     }
@@ -139,6 +143,7 @@ private suspend fun sendCommand(
         }
     }
 
+//    Log.d("check command return", String(buffer, 0, bytesRead).trim())
     return String(buffer, 0, bytesRead).trim()
 }
 
@@ -173,8 +178,60 @@ fun parseRPM(response: String?, dataFields: List<String>): Int? {
 
     val hexResult = (dataFields[4] + dataFields[5]).replace(">", "")
 //    Log.d("check dataFields", "${dataFields[3]} ${dataFields[4]}")
-    return hexResult.toInt(16) / 4
+    return (hexResult.toInt(16).toDouble() / 4).toInt()
 }
+
+fun parseMAF(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_RPM_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 6) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = (dataFields[4] + dataFields[5]).replace(">", "")
+//    Log.d("check dataFields", "${dataFields[3]} ${dataFields[4]}")
+    return (hexResult.toInt(16).toDouble() / 100).toInt()
+}
+
+fun parseThrottlePos(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_THROTTLE_POS_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 5) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = dataFields[4].replace(">", "")
+    Log.d("check dataFields", "${hexResult}")
+    return (hexResult.toInt(16).toDouble() / 255 * 100).toInt()
+}
+
+fun parseEngineLoad(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_ENGINE_LOAD_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 5) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = dataFields[4].replace(">", "")
+//    Log.d("check dataFields", "${hexResult}")
+    return (hexResult.toInt(16) / 255) * 100
+}
+
 fun parseCoolantTemp(response: String?, dataFields: List<String>): Int? {
     if (response == null) {
         Log.e("PARSE_COOLANT_TEMP_ERROR", "Empty response")
@@ -188,6 +245,23 @@ fun parseCoolantTemp(response: String?, dataFields: List<String>): Int? {
     }
 
     val hexResult = dataFields[4].replace(">", "")
-    Log.d("check dataFields", "${hexResult}")
+//    Log.d("check dataFields", "${hexResult}")
     return max(hexResult.toInt(16) - 43, 0)
+}
+
+fun parseFuel(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_FUEL_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 5) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = dataFields[4].replace(">", "")
+//    Log.d("check dataFields", "${hexResult}")
+    return (hexResult.toInt(16).toDouble() / 255 * 100).toInt()
 }

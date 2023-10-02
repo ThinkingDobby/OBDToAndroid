@@ -1,6 +1,7 @@
 package kr.rabbito.obdtoandroidwithcompose.obd
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -24,8 +25,20 @@ class OBDViewModel(
     private val _rpm: MutableLiveData<Int?> = MutableLiveData()
     val rpm: LiveData<Int?> = _rpm
 
+    private val _maf: MutableLiveData<Int?> = MutableLiveData()
+    val maf: LiveData<Int?> = _maf
+
+    private val _throttlePos: MutableLiveData<Int?> = MutableLiveData()
+    val throttlePos: LiveData<Int?> = _throttlePos
+
+    private val _engineLoad: MutableLiveData<Int?> = MutableLiveData()
+    val engineLoad: LiveData<Int?> = _engineLoad
+
     private val _coolantTemp: MutableLiveData<Int?> = MutableLiveData()
     val coolantTemp: LiveData<Int?> = _coolantTemp
+
+    private val _fuel: MutableLiveData<Int?> = MutableLiveData()
+    val fuel: LiveData<Int?> = _fuel
 
     fun loadDevice(address: String, uuid: String) {
         repository.getDevice(address, uuid).let {
@@ -46,17 +59,30 @@ class OBDViewModel(
             delay(100)
             postValue(repository.getResponse(connection, OBD_RPM))
             delay(100)
+            postValue(repository.getResponse(connection, OBD_MAF))
+            delay(100)
+            postValue(repository.getResponse(connection, OBD_THROTTLE_POS))
+            delay(100)
             postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
+            delay(100)
+            postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
+            delay(100)
+            postValue(repository.getResponse(connection, OBD_FUEL))
         }
     }
 
     private fun postValue(response: Array<Int?>?) {
         if (response == null) return
 
+        Log.d("check responseCode", response[0].toString() + " " + response[1].toString())
         when (response[0]) {
             0 -> _rpm.postValue(response[1])
             1 -> _speed.postValue(response[1])
+            2 -> _maf.postValue(response[1])
+            3 -> _throttlePos.postValue(response[1])
+            4 -> _engineLoad.postValue(response[1])
             5 -> _coolantTemp.postValue(response[1]?.minus(60))
+            6 -> _fuel.postValue(response[1])
         }
     }
 }

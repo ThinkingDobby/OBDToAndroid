@@ -39,16 +39,16 @@ fun ScannerApp(viewModel: OBDViewModel) {
             Spacer(modifier = Modifier.fillMaxSize(0.03f))
 
             Row() {
-                SmallGauge(title = "MAF", state = viewModel.speed.observeAsState(), unit = "g/s", total = 600, color = Blue)
+                SmallGauge(title = "MAF", state = viewModel.maf.observeAsState(), unit = "g/s", total = 600, color = Blue)
                 Spacer(modifier = Modifier.width(16.dp))
                 
                 Column() {
                     Spacer(modifier = Modifier.height(24.dp))
-                    SmallGauge(title = "스로틀", state = viewModel.speed.observeAsState(), unit = "%", total = 100, color = Blue)   
+                    SmallGauge(title = "스로틀", state = viewModel.throttlePos.observeAsState(), unit = "%", total = 100, color = Blue)
                 }
                 Spacer(modifier = Modifier.width(16.dp))
                 
-                SmallGauge(title = "부하", state = viewModel.speed.observeAsState(), unit = "%", total = 100, color = Blue)
+                SmallGauge(title = "부하", state = viewModel.engineLoad.observeAsState(), unit = "%", total = 100, color = Blue)
             }
 
             Spacer(modifier = Modifier.fillMaxSize(0.1f))
@@ -61,7 +61,7 @@ fun ScannerApp(viewModel: OBDViewModel) {
             BarGauge(icon = R.drawable.main_icon_coolant_temp, state = viewModel.coolantTemp.observeAsState(), total = 60, color = Green)
                 Spacer(modifier = Modifier.width(32.dp))
                 
-                BarGauge(icon = R.drawable.main_icon_fuel, state = viewModel.speed.observeAsState(), total = 100, color = Green)
+                BarGauge(icon = R.drawable.main_icon_fuel, state = viewModel.fuel.observeAsState(), total = 100, color = Green)
                 Spacer(modifier = Modifier.width(15.dp))
 
                 TextGauge(title = "평균 연비", unit = "km/L", state = viewModel.speed.observeAsState())
