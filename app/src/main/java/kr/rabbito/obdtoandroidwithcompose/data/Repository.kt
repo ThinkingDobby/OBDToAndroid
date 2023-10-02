@@ -66,10 +66,11 @@ class OBDRepository : Repository {
         val cleanedResponse = response.replace("\r", "").replace("\n", " ").replace(">", "")
         val dataFields = cleanedResponse.split(" ")
 
-//        Log.d("check cleanedResponse", cleanedResponse)
+        Log.d("check cleanedResponse", cleanedResponse)
         if (dataFields.size < 4) return null
 
         val code = dataFields[2] + " " + dataFields[3]
+        Log.d("check code", code)
 
         when (code) {
             OBD_RPM_RESPONSE -> return arrayOf(0, parseRPM(response, dataFields))

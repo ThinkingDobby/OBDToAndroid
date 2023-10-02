@@ -2,11 +2,10 @@ package kr.rabbito.obdtoandroidwithcompose.obd
 
 import android.content.Context
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.*
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kr.rabbito.obdtoandroidwithcompose.data.Repository
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Connection
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Device
@@ -52,22 +51,37 @@ class OBDViewModel(
         }
     }
 
-    suspend fun startDataLoading(connection: Connection?) {
-        while (true) {
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_SPEED))
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_RPM))
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_MAF))
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_THROTTLE_POS))
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
-            delay(100)
-            postValue(repository.getResponse(connection, OBD_FUEL))
+    suspend fun startDataLoading(connection: Connection?, lifecycleOwner: LifecycleOwner) {
+
+        lifecycleOwner.lifecycleScope.launch {
+            while (true) {
+                delay(30)
+                postValue(repository.getResponse(connection, OBD_SPEED))
+                delay(30)
+                postValue(repository.getResponse(connection, OBD_RPM))
+                delay(30)
+                postValue(repository.getResponse(connection, OBD_MAF))
+                delay(30)
+                postValue(repository.getResponse(connection, OBD_THROTTLE_POS))
+            }
+        }
+
+        lifecycleOwner.lifecycleScope.launch {
+            while (true) {
+                // 30초마다 30ms 간격으로 확인하도록 수정 필요
+                postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
+                delay(30000)
+                postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
+                delay(30000)
+            }
+        }
+
+        lifecycleOwner.lifecycleScope.launch {
+            while (true) {
+                // 5분마다 30ms 간격으로 확인하도록 수정 필요
+                postValue(repository.getResponse(connection, OBD_FUEL))
+                delay(300000)
+            }
         }
     }
 
