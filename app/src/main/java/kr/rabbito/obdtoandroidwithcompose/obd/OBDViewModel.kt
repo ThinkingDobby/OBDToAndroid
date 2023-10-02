@@ -39,6 +39,8 @@ class OBDViewModel(
     private val _fuel: MutableLiveData<Int?> = MutableLiveData()
     val fuel: LiveData<Int?> = _fuel
 
+    private val checkState = MutableList(7){false}
+
     fun loadDevice(address: String, uuid: String) {
         repository.getDevice(address, uuid).let {
             device = it
@@ -53,6 +55,7 @@ class OBDViewModel(
 
     suspend fun startDataLoading(connection: Connection?, lifecycleOwner: LifecycleOwner) {
 
+        // 실시간
         lifecycleOwner.lifecycleScope.launch {
             while (true) {
                 delay(30)
@@ -66,21 +69,31 @@ class OBDViewModel(
             }
         }
 
+        // 30초 간격
         lifecycleOwner.lifecycleScope.launch {
             while (true) {
-                // 30초마다 30ms 간격으로 확인하도록 수정 필요
-                postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
-                delay(30000)
-                postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
-                delay(30000)
+                checkState[4] = false
+                checkState[5] = false
+                while (!checkState[4] || !checkState[5]) {  // 정보 얻을 때까지는 50ms 간격으로 반복
+                    Log.d("check load", checkState.toString())
+                    postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
+                    delay(50)
+                    postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
+                    delay(50)
+                }
+                delay(30000)    // 정보 얻으면 30초 대기
             }
         }
 
+        // 70초 간격
         lifecycleOwner.lifecycleScope.launch {
             while (true) {
-                // 5분마다 30ms 간격으로 확인하도록 수정 필요
-                postValue(repository.getResponse(connection, OBD_FUEL))
-                delay(300000)
+                checkState[6] = false
+                while (!checkState[6]) {
+                    postValue(repository.getResponse(connection, OBD_FUEL))
+                    delay(70)
+                }
+                delay(70000)
             }
         }
     }
@@ -98,6 +111,8 @@ class OBDViewModel(
             5 -> _coolantTemp.postValue(response[1]?.minus(60))
             6 -> _fuel.postValue(response[1])
         }
+
+        if (!checkState[response[0]!!]) checkState[response[0]!!] = true
     }
 }
 
