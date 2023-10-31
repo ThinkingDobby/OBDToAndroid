@@ -39,7 +39,10 @@ class OBDViewModel(
     private val _fuel: MutableLiveData<Int?> = MutableLiveData()
     val fuel: LiveData<Int?> = _fuel
 
-    private val checkState = MutableList(7){false}
+    private val _fuelRate: MutableLiveData<Int?> = MutableLiveData()
+    val fuelRate: LiveData<Int?> = _fuelRate
+
+    private val checkState = MutableList(8){false}
 
     fun loadDevice(address: String, uuid: String) {
         repository.getDevice(address, uuid).let {
@@ -75,7 +78,6 @@ class OBDViewModel(
                 checkState[4] = false
                 checkState[5] = false
                 while (!checkState[4] || !checkState[5]) {  // 정보 얻을 때까지는 50ms 간격으로 반복
-                    Log.d("check load", checkState.toString())
                     postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
                     delay(50)
                     postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
@@ -89,8 +91,11 @@ class OBDViewModel(
         lifecycleOwner.lifecycleScope.launch {
             while (true) {
                 checkState[6] = false
-                while (!checkState[6]) {
+                checkState[7] = false
+                while (!checkState[6] || !checkState[7]) {
                     postValue(repository.getResponse(connection, OBD_FUEL))
+                    delay(70)
+                    postValue(repository.getResponse(connection, OBD_FUEL_RATE))
                     delay(70)
                 }
                 delay(70000)
@@ -110,6 +115,7 @@ class OBDViewModel(
             4 -> _engineLoad.postValue(response[1])
             5 -> _coolantTemp.postValue(response[1]?.minus(60))
             6 -> _fuel.postValue(response[1])
+            7 -> _fuelRate.postValue(response[1])
         }
 
         if (!checkState[response[0]!!]) checkState[response[0]!!] = true

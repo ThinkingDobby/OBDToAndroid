@@ -64,7 +64,7 @@ fun ScannerApp(viewModel: OBDViewModel) {
                 BarGauge(icon = R.drawable.main_icon_fuel, state = viewModel.fuel.observeAsState(), total = 100, color = Green)
                 Spacer(modifier = Modifier.width(15.dp))
 
-                TextGauge(title = "평균 연비", unit = "km/L", state = viewModel.speed.observeAsState())
+                TextGauge(title = "연료 소비율", unit = "L/h", state = viewModel.fuelRate.observeAsState())
             }
         }
     }

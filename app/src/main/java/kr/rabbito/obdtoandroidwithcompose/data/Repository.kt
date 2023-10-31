@@ -80,6 +80,7 @@ class OBDRepository : Repository {
             OBD_ENGINE_LOAD_RESPONSE -> return arrayOf(4, parseEngineLoad(response, dataFields))
             OBD_COOLANT_TEMP_RESPONSE -> return arrayOf(5, parseCoolantTemp(response, dataFields))
             OBD_FUEL_RESPONSE -> return arrayOf(6, parseFuel(response, dataFields))
+            OBD_FUEL_RATE_RESPONSE -> return arrayOf(7, parseFuelRate(response, dataFields))
             else -> return null
         }
     }
@@ -265,4 +266,21 @@ fun parseFuel(response: String?, dataFields: List<String>): Int? {
     val hexResult = dataFields[4].replace(">", "")
 //    Log.d("check dataFields", "${hexResult}")
     return (hexResult.toInt(16).toDouble() / 255 * 100).toInt()
+}
+
+fun parseFuelRate(response: String?, dataFields: List<String>): Int? {
+    if (response == null) {
+        Log.e("PARSE_FUEL_RATE_ERROR", "Empty response")
+
+        return null
+    }
+
+    if (dataFields.size < 6) {
+        Log.e("OBD_ERROR", "Insufficient data fields in response: $response")
+        return null
+    }
+
+    val hexResult = (dataFields[4] + dataFields[5]).replace(">", "")
+//    Log.d("check dataFields", "${dataFields[3]} ${dataFields[4]}")
+    return (hexResult.toInt(16).toDouble() * 0.05).toInt()
 }
