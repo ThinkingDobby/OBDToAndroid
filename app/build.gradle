@@ -65,4 +65,7 @@ dependencies {
 
     // Compose LiveData
     implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
+
+    // Datastore
+
 }

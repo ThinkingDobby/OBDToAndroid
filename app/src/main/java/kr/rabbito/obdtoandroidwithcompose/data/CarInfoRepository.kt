@@ -12,20 +12,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Connection
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Device
-import kr.rabbito.obdtoandroidwithcompose.obd.*
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.*
 import kotlin.math.max
 
-interface Repository {
+interface CarInfoRepository {
     fun getDevice(address: String, uuid: String): Device
     suspend fun connectToDevice(device: Device?, context: Context): Connection?
-    suspend fun getResponse(connection: Connection?, command: String): Array<Int?>?
+    fun getInfoCode(type: String): String?
+    suspend fun getResponse(connection: Connection?, command: String?): Array<Int?>?
 }
 
-class OBDRepository : Repository {
+class OBDRepository : CarInfoRepository {
     override fun getDevice(address: String, uuid: String): Device {
         val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
@@ -54,9 +54,29 @@ class OBDRepository : Repository {
         return Connection(socket, socket.inputStream, socket.outputStream)
     }
 
-    override suspend fun getResponse(connection: Connection?, command: String): Array<Int?>? {
+    override fun getInfoCode(type: String): String? {
+        return when(type) {
+            "speed" -> OBD_SPEED
+            "rpm" -> OBD_RPM
+            "maf" -> OBD_MAF
+            "throttlePos" -> OBD_THROTTLE_POS
+            "engineLoad" -> OBD_ENGINE_LOAD
+            "coolantTemp" -> OBD_COOLANT_TEMP
+            "fuel" -> OBD_FUEL
+            "fuelRate" -> OBD_FUEL_RATE
+            else -> null
+        }
+    }
+
+    override suspend fun getResponse(connection: Connection?, command: String?): Array<Int?>? {
         if (connection == null) {
             Log.e("INIT_ERROR", "Connection not set")
+
+            return null
+        }
+
+        if (command == null) {
+            Log.e("COMMAND_ERROR", "Wrong command")
 
             return null
         }

@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kr.rabbito.obdtoandroidwithcompose.R
-import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModel
+import kr.rabbito.obdtoandroidwithcompose.viewModel.CarInfoViewModel
 import kr.rabbito.obdtoandroidwithcompose.ui.component.BarGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.component.LargeGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.component.SmallGauge
@@ -20,7 +20,7 @@ import kr.rabbito.obdtoandroidwithcompose.ui.theme.LightRed
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Red
 
 @Composable
-fun ScannerApp(viewModel: OBDViewModel) {
+fun ScannerApp(viewModel: CarInfoViewModel) {
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background

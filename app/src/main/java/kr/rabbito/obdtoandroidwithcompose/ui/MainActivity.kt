@@ -11,17 +11,17 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 import kr.rabbito.obdtoandroidwithcompose.data.OBDRepository
-import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModel
-import kr.rabbito.obdtoandroidwithcompose.obd.OBDViewModelFactory
-import kr.rabbito.obdtoandroidwithcompose.obd.SPP_UUID
+import kr.rabbito.obdtoandroidwithcompose.viewModel.CarInfoViewModel
+import kr.rabbito.obdtoandroidwithcompose.viewModel.CarInfoViewModelFactory
+import kr.rabbito.obdtoandroidwithcompose.data.SPP_UUID
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.OBDToAndroidWithComposeTheme
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel by lazy {
-            ViewModelProvider(this, OBDViewModelFactory(OBDRepository())).get(OBDViewModel::class.java)
+        val obdViewModel by lazy {
+            ViewModelProvider(this, CarInfoViewModelFactory(OBDRepository())).get(CarInfoViewModel::class.java)
         }
 
         setContent {
@@ -32,14 +32,14 @@ class MainActivity : ComponentActivity() {
             }
 
             OBDToAndroidWithComposeTheme {
-                ScannerApp(viewModel)
+                ScannerApp(obdViewModel)
             }
         }
 
         lifecycleScope.launch {
-            viewModel.loadDevice("3C:9C:0F:FB:4D:F6", SPP_UUID) // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"
-            viewModel.loadConnection(viewModel.device, this@MainActivity)
-            viewModel.startDataLoading(viewModel.connection, this@MainActivity)
+            obdViewModel.loadDevice("3C:9C:0F:FB:4D:F6", SPP_UUID) // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"
+            obdViewModel.loadConnection(obdViewModel.device, this@MainActivity)
+            obdViewModel.startDataLoading(obdViewModel.connection, this@MainActivity)
         }
     }
 }

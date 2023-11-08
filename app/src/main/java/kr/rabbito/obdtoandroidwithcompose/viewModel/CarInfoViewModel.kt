@@ -1,19 +1,16 @@
-package kr.rabbito.obdtoandroidwithcompose.obd
+package kr.rabbito.obdtoandroidwithcompose.viewModel
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kr.rabbito.obdtoandroidwithcompose.data.Repository
+import kr.rabbito.obdtoandroidwithcompose.data.CarInfoRepository
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Connection
 import kr.rabbito.obdtoandroidwithcompose.data.entity.Device
-import kr.rabbito.obdtoandroidwithcompose.data.parseRPM
-import kr.rabbito.obdtoandroidwithcompose.data.parseSpeed
 
-class OBDViewModel(
-    private val repository: Repository
+class CarInfoViewModel(
+    private val repository: CarInfoRepository
 ) : ViewModel() {
     var device: Device? = null
     var connection: Connection? = null
@@ -57,18 +54,26 @@ class OBDViewModel(
     }
 
     suspend fun startDataLoading(connection: Connection?, lifecycleOwner: LifecycleOwner) {
+        val speedCode = repository.getInfoCode("speed")
+        val rpmCode = repository.getInfoCode("rpm")
+        val mafCode = repository.getInfoCode("maf")
+        val throttlePosCode = repository.getInfoCode("throttlePos")
+        val engineLoadCode = repository.getInfoCode("engineLoad")
+        val coolantTempCode = repository.getInfoCode("coolantTemp")
+        val fuelCode = repository.getInfoCode("fuel")
+        val fuelRateCode = repository.getInfoCode("fuelRate")
 
         // 실시간
         lifecycleOwner.lifecycleScope.launch {
             while (true) {
                 delay(30)
-                postValue(repository.getResponse(connection, OBD_SPEED))
+                postValue(repository.getResponse(connection, speedCode))
                 delay(30)
-                postValue(repository.getResponse(connection, OBD_RPM))
+                postValue(repository.getResponse(connection, rpmCode))
                 delay(30)
-                postValue(repository.getResponse(connection, OBD_MAF))
+                postValue(repository.getResponse(connection, mafCode))
                 delay(30)
-                postValue(repository.getResponse(connection, OBD_THROTTLE_POS))
+                postValue(repository.getResponse(connection, throttlePosCode))
             }
         }
 
@@ -78,9 +83,9 @@ class OBDViewModel(
                 checkState[4] = false
                 checkState[5] = false
                 while (!checkState[4] || !checkState[5]) {  // 정보 얻을 때까지는 50ms 간격으로 반복
-                    postValue(repository.getResponse(connection, OBD_ENGINE_LOAD))
+                    postValue(repository.getResponse(connection, engineLoadCode))
                     delay(50)
-                    postValue(repository.getResponse(connection, OBD_COOLANT_TEMP))
+                    postValue(repository.getResponse(connection, coolantTempCode))
                     delay(50)
                 }
                 delay(30000)    // 정보 얻으면 30초 대기
@@ -93,9 +98,9 @@ class OBDViewModel(
                 checkState[6] = false
                 checkState[7] = false
                 while (!checkState[6] || !checkState[7]) {
-                    postValue(repository.getResponse(connection, OBD_FUEL))
+                    postValue(repository.getResponse(connection, fuelCode))
                     delay(70)
-                    postValue(repository.getResponse(connection, OBD_FUEL_RATE))
+                    postValue(repository.getResponse(connection, fuelRateCode))
                     delay(70)
                 }
                 delay(70000)
@@ -122,10 +127,10 @@ class OBDViewModel(
     }
 }
 
-class OBDViewModelFactory(private val repository: Repository) : ViewModelProvider.Factory {
+class CarInfoViewModelFactory(private val repository: CarInfoRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(OBDViewModel::class.java)) {
-            return OBDViewModel(repository) as T
+        if (modelClass.isAssignableFrom(CarInfoViewModel::class.java)) {
+            return CarInfoViewModel(repository) as T
         }
 
         throw IllegalArgumentException("Unknown ViewModel class :: ${modelClass::class.java.simpleName}")
