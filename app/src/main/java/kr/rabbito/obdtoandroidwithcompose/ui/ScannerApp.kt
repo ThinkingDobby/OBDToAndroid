@@ -38,8 +38,8 @@ fun ScannerApp(
         }
 
         if (macAddress == null) {
-            val newMacAddressState = remember { mutableStateOf("asdf") }
-            TextFieldDialog(newMacAddressState)
+            val newMacAddressState = remember { mutableStateOf("") }
+            TextFieldDialog(newMacAddressState, {})
 
             LaunchedEffect(Unit) {
                 // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"

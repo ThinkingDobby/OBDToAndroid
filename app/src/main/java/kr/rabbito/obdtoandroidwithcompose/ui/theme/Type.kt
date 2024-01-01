@@ -110,3 +110,16 @@ val dialogInputStyle = TextStyle(
     fontSize = 14.sp,
     color = Black
 )
+
+val dialogInputHintStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 14.sp,
+    color = Gray
+)
+
+val dialogButtonStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontWeight = FontWeight.Medium,
+    fontSize = 14.sp,
+    color = Blue
+)
