@@ -91,3 +91,22 @@ val textGaugeUnitStyle = TextStyle(
     fontSize = 14.sp,
     color = Gray
 )
+
+val dialogTitleStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontWeight = FontWeight.SemiBold,
+    fontSize = 16.sp,
+    color = Black
+)
+
+val dialogExampleStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 12.sp,
+    color = Gray
+)
+
+val dialogInputStyle = TextStyle(
+    fontFamily = Pretendard,
+    fontSize = 14.sp,
+    color = Black
+)

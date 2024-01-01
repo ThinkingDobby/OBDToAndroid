@@ -5,20 +5,15 @@ import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import kr.rabbito.obdtoandroidwithcompose.R
 import kr.rabbito.obdtoandroidwithcompose.data.SPP_UUID
+import kr.rabbito.obdtoandroidwithcompose.ui.component.*
 import kr.rabbito.obdtoandroidwithcompose.viewModel.CarInfoViewModel
-import kr.rabbito.obdtoandroidwithcompose.ui.component.BarGauge
-import kr.rabbito.obdtoandroidwithcompose.ui.component.LargeGauge
-import kr.rabbito.obdtoandroidwithcompose.ui.component.SmallGauge
-import kr.rabbito.obdtoandroidwithcompose.ui.component.TextGauge
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Blue
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.Green
 import kr.rabbito.obdtoandroidwithcompose.ui.theme.LightRed
@@ -43,9 +38,12 @@ fun ScannerApp(
         }
 
         if (macAddress == null) {
+            val newMacAddressState = remember { mutableStateOf("asdf") }
+            TextFieldDialog(newMacAddressState)
+
             LaunchedEffect(Unit) {
                 // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"
-                dataStoreViewModel.saveAndSetMacAddress("3C:9C:0F:FB:4D:F6")
+//                dataStoreViewModel.saveAndSetMacAddress("3C:9C:0F:FB:4D:F6")
             }
         } else {
             LaunchedEffect(Unit) {
