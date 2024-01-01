@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -24,7 +25,15 @@ import kr.rabbito.obdtoandroidwithcompose.ui.theme.*
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @Composable
-fun TextFieldDialog(textState: MutableState<String>, onConfirmation: () -> Unit) {
+fun TextFieldDialog(
+    title: @Composable () -> Unit,
+    smallText: @Composable () -> Unit,
+    placeholder: @Composable () -> Unit,
+    inputStyle: TextStyle,
+    buttonStyle: TextStyle,
+    textState: MutableState<String>,
+    onConfirmation: () -> Unit)
+{
     Dialog(
         onDismissRequest = { },
     ) {
@@ -38,18 +47,10 @@ fun TextFieldDialog(textState: MutableState<String>, onConfirmation: () -> Unit)
             Column(
                 modifier = Modifier.padding(top = 32.dp, start = 38.dp)
             ) {
-                Row() {
-                    Text(text = "OBD 스캐너", style = dialogTitleStyle)
-                    Text(text = "의", style = dialogTitleStyle, fontWeight = FontWeight.Normal)
-                }
-
-                Row() {
-                    Text(text = "MAC 주소", style = dialogTitleStyle, color = Blue)
-                    Text(text = "를 입력하세요.", style = dialogTitleStyle, fontWeight = FontWeight.Normal)
-                }
+                title()
 
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = "예) 0A:1B:2C:D3:E4:F5", style = dialogExampleStyle)
+                smallText()
 
                 Spacer(modifier = Modifier.height(13.dp))
 
@@ -71,9 +72,9 @@ fun TextFieldDialog(textState: MutableState<String>, onConfirmation: () -> Unit)
                         value = textState.value,
                         onValueChange = { textState.value = it },
                         modifier = Modifier.size(width = 200.dp, height = 50.dp),
-                        textStyle = dialogInputStyle,
+                        textStyle = inputStyle,
                         singleLine = true,
-                        placeholder = { Text("':' 을 포함해 입력하세요.", style = dialogInputHintStyle) }
+                        placeholder = placeholder
                     )
                 }
 
@@ -89,7 +90,7 @@ fun TextFieldDialog(textState: MutableState<String>, onConfirmation: () -> Unit)
                             .padding(16.dp)
                             .size(width = 24.dp, height = 18.dp)
                     ) {
-                        Text("확인", style = dialogButtonStyle)
+                        Text("확인", style = buttonStyle)
                     }
                     
                     Spacer(modifier = Modifier.width(24.dp))

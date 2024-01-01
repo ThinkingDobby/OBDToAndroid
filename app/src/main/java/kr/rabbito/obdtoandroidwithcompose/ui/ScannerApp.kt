@@ -3,6 +3,7 @@ package kr.rabbito.obdtoandroidwithcompose.ui
 import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
@@ -15,11 +16,8 @@ import kotlinx.coroutines.launch
 import kr.rabbito.obdtoandroidwithcompose.R
 import kr.rabbito.obdtoandroidwithcompose.data.SPP_UUID
 import kr.rabbito.obdtoandroidwithcompose.ui.component.*
+import kr.rabbito.obdtoandroidwithcompose.ui.theme.*
 import kr.rabbito.obdtoandroidwithcompose.viewModel.CarInfoViewModel
-import kr.rabbito.obdtoandroidwithcompose.ui.theme.Blue
-import kr.rabbito.obdtoandroidwithcompose.ui.theme.Green
-import kr.rabbito.obdtoandroidwithcompose.ui.theme.LightRed
-import kr.rabbito.obdtoandroidwithcompose.ui.theme.Red
 import kr.rabbito.obdtoandroidwithcompose.viewModel.SettingInfoViewModel
 
 @Composable
@@ -32,32 +30,7 @@ fun ScannerApp(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
-        val macAddress by dataStoreViewModel.macAddress.observeAsState()
-        LaunchedEffect(Unit) {
-//            dataStoreViewModel.clearMacAddress()
-            dataStoreViewModel.loadMacAddress()
-            Log.d("check mac address", macAddress ?: "null")
-        }
-
-        if (macAddress == null) {
-            val newMacAddressState = remember { mutableStateOf("") }
-            val coroutineScope = rememberCoroutineScope()
-
-            TextFieldDialog(newMacAddressState) {
-                coroutineScope.launch {
-                    // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"
-                    // 노트북 OBD2 장치의 MAC 주소: "3C:9C:0F:FB:4D:F6"
-                    dataStoreViewModel.saveAndSetMacAddress(newMacAddressState.value)
-                }
-            }
-        } else {
-            Log.d("check mac address", macAddress ?: "null")
-            LaunchedEffect(Unit) {
-                obdViewModel.loadDevice(macAddress!!, SPP_UUID)
-                obdViewModel.loadConnection(obdViewModel.device, context)
-                obdViewModel.startDataLoading(obdViewModel.connection, context as MainActivity)
-            }
-        }
+        InitMacAddress(context, obdViewModel, dataStoreViewModel)
 
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -148,4 +121,45 @@ fun ScannerApp(
     }
 }
 
+@Composable
+fun InitMacAddress(
+    context: Context,
+    obdViewModel: CarInfoViewModel,
+    dataStoreViewModel: SettingInfoViewModel,
+) {
+    val macAddress by dataStoreViewModel.macAddress.observeAsState("not loaded")
 
+    LaunchedEffect(Unit) {
+//            dataStoreViewModel.clearMacAddress()
+        dataStoreViewModel.loadMacAddress()
+        Log.d("check mac address", macAddress ?: "null")
+    }
+
+    if (macAddress == "not loaded") {
+        // 대기
+    } else if (macAddress == null) {
+        val newMacAddressState = remember { mutableStateOf("") }
+        val coroutineScope = rememberCoroutineScope()
+
+        TextFieldDialog(
+            { MacAddressDialogTitle() },
+            { MacAddressDialogSmallText() },
+            { MacAddressDialogPlaceholder() },
+            dialogInputStyle,
+            dialogButtonStyle,
+            newMacAddressState
+        ) {
+            coroutineScope.launch {
+                // 차량 OBD2 장치의 MAC 주소: "00:1D:A5:02:6E:FB"
+                // 노트북 OBD2 장치의 MAC 주소: "3C:9C:0F:FB:4D:F6"
+                dataStoreViewModel.saveAndSetMacAddress(newMacAddressState.value)
+            }
+        }
+    } else {
+        LaunchedEffect(Unit) {
+            obdViewModel.loadDevice(macAddress!!, SPP_UUID)
+            obdViewModel.loadConnection(obdViewModel.device, context)
+            obdViewModel.startDataLoading(obdViewModel.connection, context as MainActivity)
+        }
+    }
+}
