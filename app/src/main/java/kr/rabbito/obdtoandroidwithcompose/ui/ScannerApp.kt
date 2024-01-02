@@ -2,6 +2,7 @@ package kr.rabbito.obdtoandroidwithcompose.ui
 
 import android.content.Context
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -10,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -115,6 +117,28 @@ fun ScannerApp(
                     title = "연료 소비율",
                     unit = "L/h",
                     state = obdViewModel.fuelRate.observeAsState()
+                )
+            }
+            
+            Spacer(modifier = Modifier.fillMaxSize(0f))
+
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 22.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+
+                Image(
+                    painterResource(id = R.drawable.main_icon_setting),
+                    "gauge background",
+                    modifier = Modifier.size(32.dp)
+                )
+
+                Image(
+                    painterResource(id = R.drawable.main_icon_info),
+                    "gauge background",
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
